@@ -7,7 +7,8 @@ class wiki():
         self.tool = utils(args)
         self.setup(args)#process the arguments
 
-    def getLinks(self,url):
+    def getLinks(self,name):
+        url = self.makeUrl(name)
         req = requests.get(url)
         soup = BeautifulSoup(req.text, "html.parser")
 
@@ -15,33 +16,33 @@ class wiki():
         list=[]
         for link in soup.find_all('a', href=True):
             href=link["href"]
-            if href.startswith("/wiki/"):
-                href=href.split(":")[0]
+            if href.startswith("/wiki/") and len(href)>6:
+                href=href[6:]#remove the "/wiki/" part
                 list.append(href)
 
         #Cleaning duplicates
-        list2=[]
+        pages=[]
         for l in list:
-            if l not in list2:
-                list2.append(l)
+            if l not in pages:
+                pages.append(l)
                 print(l)
 
-        return list2
+        return pages
 
     def makeUrl(self, name):
-        return "https://fr.wikipedia.org/{}".format(name)
+        return "https://fr.wikipedia.org/wiki/{}".format(name)
 
     def setup(self,args):
-        if self.tool.argHasValue("-url"):
-          self.url = self.tool.argValue("-url")
+        if self.tool.argHasValue("-name"):
+          self.name = self.tool.argValue("-name")
         else:
-            print("-url is missing")
+            print("-name is missing")
             exit(0)
 
     def run(self):
         print("Hey")
-        print("The url is {}".format(self.url))
-        self.getLinks(self.url)
+        print("The starting url is {}".format(self.makeUrl(self.name)))
+        self.getLinks(self.name)
 
     def stop(self, msg = ""):
         if msg != "": print(msg)
