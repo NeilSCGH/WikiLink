@@ -25,7 +25,6 @@ class wiki():
         for l in list:
             if l not in links:
                 links.append(l)
-                print(l)
 
         return links
 
@@ -34,15 +33,60 @@ class wiki():
 
     def setup(self,args):
         if self.tool.argHasValue("-name"):
-          self.name = self.tool.argValue("-name")
+            self.startName = self.tool.argValue("-name")
         else:
             print("-name is missing")
             exit(0)
 
+        if self.tool.argHasValue("-d"):
+            self.depth = int(self.tool.argValue("-d"))
+            if self.depth < 1:
+                print("-d is invalid")
+                exit(0)
+        else:
+            print("-d is missing")
+            exit(0)
+
+        self.relations=[]
+
+    def getPathFromName(self, name):
+        for n, p in self.relations:
+            if n==name:
+                return p
+        return ["ERROR"] #not found
+
+    def findNameInRelations(self, name):
+        for index, (n, p) in enumerate(self.relations):
+            if n==name:
+                return index
+        return -1 #not found
+
+    def addToRelations(self, newNames, path):
+        for name in newNames:
+            if name not in self.alreadyScanned:
+                self.relations.append([name, path])
+        #remove duplicate, simplify paths
+
     def run(self):
         print("Hey")
-        print("The starting url is {}".format(self.makeUrl(self.name)))
-        self.getLinks(self.name)
+        print("The starting url is {}".format(self.makeUrl(self.startName)))
+
+        self.relations.append([self.startName, [self.startName]])
+
+        self.toScan = [self.startName]
+        self.alreadyScanned = []
+
+        for d in range(self.depth):
+            self.alreadyScanned += self.toScan
+            for name in self.toScan:
+                currentPath = self.getPathFromName(name)
+                newNames = self.getLinks(name)
+                path = currentPath + [name]
+
+                self.addToRelations(newNames, path)
+
+        for a,b in self.relations: print(a,b)
+
 
     def stop(self, msg = ""):
         if msg != "": print(msg)
