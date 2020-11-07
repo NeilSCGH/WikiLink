@@ -14,20 +14,20 @@ class wiki():
 
         #Extracting links
         list=[]
-        for link in soup.find_all('a', href=True):
-            href=link["href"]
+        for a in soup.find_all('a', href=True):
+            href=a["href"]
             if href.startswith("/wiki/") and len(href)>6:
                 href=href[6:]#remove the "/wiki/" part
                 list.append(href)
 
         #Cleaning duplicates
-        pages=[]
+        links=[]
         for l in list:
-            if l not in pages:
-                pages.append(l)
+            if l not in links:
+                links.append(l)
                 print(l)
 
-        return pages
+        return links
 
     def makeUrl(self, name):
         return "https://fr.wikipedia.org/wiki/{}".format(name)
