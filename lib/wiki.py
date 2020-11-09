@@ -32,6 +32,16 @@ class wiki():
             if l not in self.foundNames:
                 links3.append(l)
 
+        if self.noTech: #remove names containing ":"
+            links4=[]
+            for l in links3:
+                if ":" not in l:
+                    links4.append(l)
+            links3 = links4[:]
+
+        if self.max>0:
+            links3=links3[:self.max]
+
         return links3
 
     def makeUrl(self, name):
@@ -56,6 +66,12 @@ class wiki():
         self.endName=""
         if self.tool.argHasValue("-end"):
             self.endName = self.tool.argValue("-end")
+
+        self.max=0
+        if self.tool.argHasValue("-max"):
+            self.max = int(self.tool.argValue("-max"))
+
+        self.noTech = self.tool.argExist("-noTech")
 
         self.relations=[]
 
