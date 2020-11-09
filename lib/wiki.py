@@ -13,20 +13,26 @@ class wiki():
         soup = BeautifulSoup(req.text, "html.parser")
 
         #Extracting links
-        list=[]
+        links=[]
         for a in soup.find_all('a', href=True):
             href=a["href"]
             if href.startswith("/wiki/") and len(href)>6:
                 href=href[6:]#remove the "/wiki/" part
-                list.append(href)
+                links.append(href)
 
-        #Cleaning duplicates
-        links=[]
-        for l in list:
-            if l not in links:
-                links.append(l)
+        #Cleaning duplicates 
+        links2=[]
+        for l in links:
+            if l not in links2:
+                links2.append(l)
 
-        return links
+        #Cleaning already found links
+        links3=[]
+        for l in links2:
+            if l not in self.foundNames:
+                links3.append(l)
+
+        return links3
 
     def makeUrl(self, name):
         return "https://fr.wikipedia.org/wiki/{}".format(name)
@@ -61,29 +67,42 @@ class wiki():
                 return index
         return -1 #not found
 
-    def addToRelations(self, newNames, path):
-        for name in newNames:
-            if name not in self.alreadyScanned:
-                self.relations.append([name, path])
-        #remove duplicate, simplify paths
-
     def run(self):
         print("Hey")
         print("The starting url is {}".format(self.makeUrl(self.startName)))
 
-        self.relations.append([self.startName, [self.startName]])
+        self.relations.append([self.startName, []])
 
-        self.toScan = [self.startName]
-        self.alreadyScanned = []
+        self.toScan = [[self.startName, []]] #elements : [names, path] with path = [name1, name2, ...]
+        self.relations = [] #elements : [names, path]
+        self.foundNames = [] #elements : names
 
         for d in range(self.depth):
-            self.alreadyScanned += self.toScan
-            for name in self.toScan:
-                currentPath = self.getPathFromName(name)
+
+            #Finding new links on ToScan links
+            newLinksFound=[] #elements : [names, path] 
+            for name, currentPath in self.toScan:
+                if currentPath==[]:
+                    print("Scanning {:>50.50} -> {:<50.50} ".format(".", name),end="")
+                else:
+                    print("Scanning {:>50.50} -> {:<50.50} ".format(currentPath[-1], name),end="")
                 newNames = self.getLinks(name)
                 path = currentPath + [name]
 
-                self.addToRelations(newNames, path)
+                print("{} links found".format(len(newNames)))
+
+                for nn in newNames:
+                    newLinksFound.append([nn, path])
+
+            #ToScan links are now "used"
+            self.relations += self.toScan
+
+            #Filtering new found links, adding them to ToScan list
+            self.toScan=[]
+            for name, path in newLinksFound:
+                self.toScan.append([name, path])
+
+            self.foundNames += [elem[0] for elem in self.toScan]#extract the names
 
         for a,b in self.relations: print(a,b)
 
