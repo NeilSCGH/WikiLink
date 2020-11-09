@@ -1,4 +1,7 @@
 # WikiLink
+
+This program is made to find link between two Wikipedia pages. 
+For example to go from Bitcoin to MD5 using only hyperlink on the page, a path can be `bitcoin`, then `Fonction_de_hachage` and then `md5`. This program will find these paths.
 ```
 Usage: python main.py -start start_name -end end_name
                       -d depth [-max count] [-noTech]
