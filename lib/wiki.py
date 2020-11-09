@@ -53,6 +53,10 @@ class wiki():
             print("-d is missing")
             exit(0)
 
+        self.endName=""
+        if self.tool.argHasValue("-end"):
+            self.endName = self.tool.argValue("-end")
+
         self.relations=[]
 
     def getPathFromName(self, name):
@@ -70,6 +74,7 @@ class wiki():
     def run(self):
         print("Hey")
         print("The starting url is {}".format(self.makeUrl(self.startName)))
+        print("The target name is {}".format(self.endName))
 
         self.relations.append([self.startName, []])
 
@@ -86,11 +91,13 @@ class wiki():
 
             #Finding new links on ToScan links
             newLinksFound=[] #elements : [names, path] 
-            for name, currentPath in self.toScan:
+            n=len(self.toScan)
+            for index, (name, currentPath) in enumerate(self.toScan):
                 if currentPath==[]:
                     print("Scanning {:>50.50} -> {:<50.50} ".format(".", name),end="")
                 else:
-                    print("Scanning {:>50.50} -> {:<50.50} ".format(currentPath[-1], name),end="")
+                    currentName = "{} ({:}/{})".format(currentPath[-1],index+1, n)
+                    print("Scanning {:>50.50} -> {:<50.50} ".format(currentName, name),end="")
                 newNames = self.getLinks(name)
                 path = currentPath + [name]
 
@@ -105,11 +112,19 @@ class wiki():
             #Filtering new found links, adding them to ToScan list
             self.toScan=[]
             for name, path in newLinksFound:
+                if name==self.endName:
+                    print("FOUND !!!")
+                    for p in path:
+                        print("{} -> ".format(p), end="")
+                    print(self.endName)
+
+                    exit(0)
+
                 self.toScan.append([name, path])
 
             self.foundNames += [elem[0] for elem in self.toScan]#extract the names
 
-        for a,b in self.relations: print(a,b)
+        for a,b in self.relations: print(b,a)
 
 
     def stop(self, msg = ""):
