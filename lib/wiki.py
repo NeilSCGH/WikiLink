@@ -14,6 +14,11 @@ class wiki():
 
         if self.utils.argHasValue("-start"):
             self.startName = self.utils.argValue("-start")
+
+            if not self.pageExists(self.startName):
+                print("Start page doesn't exists !")
+                exit(0)
+
         else:
             print("-start is missing")
             self.help()
@@ -23,7 +28,6 @@ class wiki():
             self.depth = int(self.utils.argValue("-d"))
             if self.depth < 1:
                 print("-d is invalid")
-                self.help()
                 exit(0)
         else:
             print("-d is missing")
@@ -33,6 +37,10 @@ class wiki():
         self.endName=""
         if self.utils.argHasValue("-end"):
             self.endName = (self.utils.argValue("-end")).lower()
+
+            if not self.pageExists(self.endName):
+                print("End page doesn't exists !")
+                exit(0)
 
         self.max=0
         if self.utils.argHasValue("-max"):
@@ -106,6 +114,19 @@ class wiki():
 
     def makeUrl(self, name):
         return "https://fr.wikipedia.org/wiki/{}".format(name)
+
+    def pageExists(self,name):
+        url = self.makeUrl(name)
+        req = requests.get(url)
+        soup = BeautifulSoup(req.text, "html.parser")
+
+        #Extracting links
+        links=[]
+        for li in soup.find_all('li', id=True):
+            if li["id"] == "footer-info-copyright":
+                return True
+
+        return False
 
     def run(self):
         print("Hey")
