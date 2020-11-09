@@ -4,40 +4,68 @@ from bs4 import BeautifulSoup
 
 class wiki():
     def __init__(self,args):
-        self.tool = utils(args)
+        self.utils = utils(args)
         self.setup(args)#process the arguments
 
     def setup(self,args):
-        if self.tool.argHasValue("-name"):
-            self.startName = self.tool.argValue("-name")
-        else:
-            print("-name is missing")
+        if self.utils.argExist("-h") or self.utils.argExist("-help") or self.utils.argExist("-?"):
+            self.help()
             exit(0)
 
-        if self.tool.argHasValue("-d"):
-            self.depth = int(self.tool.argValue("-d"))
+        if self.utils.argHasValue("-start"):
+            self.startName = self.utils.argValue("-start")
+        else:
+            print("-start is missing")
+            self.help()
+            exit(0)
+
+        if self.utils.argHasValue("-d"):
+            self.depth = int(self.utils.argValue("-d"))
             if self.depth < 1:
                 print("-d is invalid")
+                self.help()
                 exit(0)
         else:
             print("-d is missing")
+            self.help()
             exit(0)
 
         self.endName=""
-        if self.tool.argHasValue("-end"):
-            self.endName = (self.tool.argValue("-end")).lower()
+        if self.utils.argHasValue("-end"):
+            self.endName = (self.utils.argValue("-end")).lower()
 
         self.max=0
-        if self.tool.argHasValue("-max"):
-            self.max = int(self.tool.argValue("-max"))
+        if self.utils.argHasValue("-max"):
+            self.max = int(self.utils.argValue("-max"))
+            if self.max < 1:
+                print("-max is invalid")                
+                self.help()
+                exit(0)
 
-        self.noTech = self.tool.argExist("-noTech")
+        self.noTech = self.utils.argExist("-noTech")
+
+
 
         self.relations=[[self.startName, []]]
 
         self.toScan = [[self.startName, []]] #elements : [names, path] with path = [name1, name2, ...]
         self.relations = [] #elements : [names, path]
         self.foundNames = [] #elements : names
+
+    def help(self):
+        print()
+        print("Usage: python main.py -start start_name -end end_name")
+        print("                      -d depth [-max count] [-noTech]")
+        print("                      [[-h] | [-help] | [-?]]")
+        print()
+        print("Options:")
+        print("   -start start_name  The starting name page.")
+        print("   -end end_name      The target name page.")
+        print("                      If not set, will reach the depth provided using -d, then stop.")
+        print("   -d depth           The maximum allowed depth to scan.")
+        print("   -max count         (Optional) The maximum number of links to extract from each page.")
+        print("   -noTech            (Optional) Exclude technical pages (containing \":\" in the name).")
+        print("   -h|help|?          (Optional) Print this help.")
 
     def getLinks(self,name):
         url = self.makeUrl(name)
