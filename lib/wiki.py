@@ -7,6 +7,38 @@ class wiki():
         self.tool = utils(args)
         self.setup(args)#process the arguments
 
+    def setup(self,args):
+        if self.tool.argHasValue("-name"):
+            self.startName = self.tool.argValue("-name")
+        else:
+            print("-name is missing")
+            exit(0)
+
+        if self.tool.argHasValue("-d"):
+            self.depth = int(self.tool.argValue("-d"))
+            if self.depth < 1:
+                print("-d is invalid")
+                exit(0)
+        else:
+            print("-d is missing")
+            exit(0)
+
+        self.endName=""
+        if self.tool.argHasValue("-end"):
+            self.endName = (self.tool.argValue("-end")).lower()
+
+        self.max=0
+        if self.tool.argHasValue("-max"):
+            self.max = int(self.tool.argValue("-max"))
+
+        self.noTech = self.tool.argExist("-noTech")
+
+        self.relations=[[self.startName, []]]
+
+        self.toScan = [[self.startName, []]] #elements : [names, path] with path = [name1, name2, ...]
+        self.relations = [] #elements : [names, path]
+        self.foundNames = [] #elements : names
+
     def getLinks(self,name):
         url = self.makeUrl(name)
         req = requests.get(url)
@@ -47,56 +79,10 @@ class wiki():
     def makeUrl(self, name):
         return "https://fr.wikipedia.org/wiki/{}".format(name)
 
-    def setup(self,args):
-        if self.tool.argHasValue("-name"):
-            self.startName = self.tool.argValue("-name")
-        else:
-            print("-name is missing")
-            exit(0)
-
-        if self.tool.argHasValue("-d"):
-            self.depth = int(self.tool.argValue("-d"))
-            if self.depth < 1:
-                print("-d is invalid")
-                exit(0)
-        else:
-            print("-d is missing")
-            exit(0)
-
-        self.endName=""
-        if self.tool.argHasValue("-end"):
-            self.endName = self.tool.argValue("-end")
-
-        self.max=0
-        if self.tool.argHasValue("-max"):
-            self.max = int(self.tool.argValue("-max"))
-
-        self.noTech = self.tool.argExist("-noTech")
-
-        self.relations=[]
-
-    def getPathFromName(self, name):
-        for n, p in self.relations:
-            if n==name:
-                return p
-        return ["ERROR"] #not found
-
-    def findNameInRelations(self, name):
-        for index, (n, p) in enumerate(self.relations):
-            if n==name:
-                return index
-        return -1 #not found
-
     def run(self):
         print("Hey")
         print("The starting url is {}".format(self.makeUrl(self.startName)))
         print("The target name is {}".format(self.endName))
-
-        self.relations.append([self.startName, []])
-
-        self.toScan = [[self.startName, []]] #elements : [names, path] with path = [name1, name2, ...]
-        self.relations = [] #elements : [names, path]
-        self.foundNames = [] #elements : names
 
         for d in range(self.depth):
 
@@ -128,8 +114,8 @@ class wiki():
             #Filtering new found links, adding them to ToScan list
             self.toScan=[]
             for name, path in newLinksFound:
-                if name==self.endName:
-                    print("FOUND !!!")
+                if name.lower()==self.endName:
+                    print("\nFOUND !!!")
                     for p in path:
                         print("{} -> ".format(p), end="")
                     print(self.endName)
