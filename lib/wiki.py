@@ -54,9 +54,9 @@ class wiki():
 
     def help(self):
         print()
-        print("Usage: python main.py -start start_name -end end_name")
-        print("                      -d depth [-max count] [-noTech]")
-        print("                      [[-h] | [-help] | [-?]]")
+        print("Usage: python wikilink.py -start start_name -end end_name")
+        print("                          -d depth [-max count] [-noTech]")
+        print("                          [[-h] | [-help] | [-?]]")
         print()
         print("Options:")
         print("   -start start_name  The starting name page.")

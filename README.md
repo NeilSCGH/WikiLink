@@ -1,8 +1,8 @@
 # WikiLink
 ```
-Usage: python main.py -start start_name -end end_name
-                      -d depth [-max count] [-noTech]
-                      [[-h] | [-help] | [-?]]
+Usage: python wikilink.py -start start_name -end end_name
+                          -d depth [-max count] [-noTech]
+                          [[-h] | [-help] | [-?]]
 
 Options:
    -start start_name  The starting name page.
