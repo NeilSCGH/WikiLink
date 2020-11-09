@@ -79,6 +79,11 @@ class wiki():
 
         for d in range(self.depth):
 
+            print()
+            print("#"*101)
+            print("{0} Depth {1:>2}/{2:<2} {0}".format("#"*44, d+1, self.depth))
+            print("#"*101)
+
             #Finding new links on ToScan links
             newLinksFound=[] #elements : [names, path] 
             for name, currentPath in self.toScan:
