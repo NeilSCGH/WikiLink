@@ -1,5 +1,7 @@
 from lib.utils import *
 import requests
+
+utils.checkRequirements(["bs4"])
 from bs4 import BeautifulSoup
 
 class wiki():
