@@ -35,7 +35,7 @@ class utils():
     python = sys.executable
     for module in required:
       if module not in installed:
-        print("Installing module: {} ".format(module), end="")
+        print("Installing missing module: {} ".format(module), end="")
         try:
           subprocess.check_call([python, '-m', 'pip', 'install', module], stdout=subprocess.DEVNULL)
         except:
